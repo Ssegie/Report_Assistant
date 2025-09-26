@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import ReportCard from "./ReportCard";
+import ReportCard from "../components/ReportCard";
 
 export default function ReportHistory() {
   const [reports, setReports] = useState([]);

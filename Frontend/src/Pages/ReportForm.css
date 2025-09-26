@@ -1,0 +1,175 @@
+/* Global resets */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Container / Card */
+.register-container, .report-form {
+  background-color: #e6f4ea; /* lighter green background */
+  border: 2px solid #34d399; 
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 36rem;
+  margin: 2rem auto;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  animation: bounce-slow 3s infinite;
+}
+
+/* Header */
+.register-header, .report-form h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #065f46;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Form layout */
+.register-form, .report-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.register-form label, .report-form label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #065f46;
+}
+
+/* Inputs & selects */
+.register-form input,
+.register-form select,
+.report-form input,
+.report-form select,
+.report-form textarea {
+  padding: 12px 15px;
+  border: 2px solid #6ee7b7;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  outline: none;
+  width: 100%;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.register-form input:focus,
+.register-form select:focus,
+.report-form input:focus,
+.report-form select:focus,
+.report-form textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+/* Error message */
+.error-message, .report-form .error {
+  color: #dc2626;
+  background-color: #fdecea;
+  padding: 10px 15px;
+  border-radius: 0.5rem;
+  font-size: 14px;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+/* Buttons */
+.register-form button, .report-form button {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  background-color: #10b981;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.register-form button:hover, .report-form button:hover {
+  background-color: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.3);
+}
+
+.register-form button:disabled, .report-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .register-container, .report-form {
+    padding: 1.5rem;
+  }
+
+  .register-header, .report-form h2 {
+    font-size: 1.25rem;
+  }
+
+  .register-form, .report-form form {
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .register-container, .report-form {
+    padding: 1rem;
+  }
+
+  .register-header, .report-form h2 {
+    font-size: 1.1rem;
+  }
+
+  .register-form input,
+  .register-form select,
+  .report-form input,
+  .report-form select,
+  .report-form textarea {
+    padding: 10px 12px;
+  }
+}
+/* Adverse Events buttons */
+.adverse-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.adverse-buttons button {
+  padding: 0.5rem 1rem;
+  border: 2px solid #34d399;
+  border-radius: 0.5rem;
+  background-color: white;
+  color: #065f46;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.adverse-buttons button:hover {
+  background-color: #d1fae5;
+}
+
+.adverse-buttons button.active {
+  background-color: #10b981;
+  color: white;
+  border-color: #10b981;
+}
