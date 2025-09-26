@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import './ReportForm.css'; // Import the CSS
 
 export default function ReportForm({ onReportProcessed }) {
   const [reportText, setReportText] = useState("");
@@ -9,20 +10,18 @@ export default function ReportForm({ onReportProcessed }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!reportText.trim()) return setError("Report cannot be empty");
-
+    if (!reportText.trim() && !file) return setError("Report text or file is required");
     setLoading(true);
     setError("");
 
-    try {
-      const formData = new FormData();
-      formData.append("report", reportText);
-      if (file) formData.append("file", file);
+    const formData = new FormData();
+    formData.append("report", reportText);
+    if (file) formData.append("file", file);
 
+    try {
       const res = await axios.post("http://localhost:8000/api/process-report/", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       onReportProcessed(res.data);
       setReportText("");
       setFile(null);
@@ -35,25 +34,24 @@ export default function ReportForm({ onReportProcessed }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-4 border rounded shadow">
+    <form onSubmit={handleSubmit} className="report-form">
+      <h2>Submit Medical Report</h2>
+
       <textarea
         rows={5}
-        placeholder="Paste medical report here..."
+        placeholder="Paste report here..."
         value={reportText}
         onChange={(e) => setReportText(e.target.value)}
-        className="w-full p-2 border rounded"
       />
+
       <input
         type="file"
         onChange={(e) => setFile(e.target.files[0])}
-        className="mt-2"
       />
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-      <button
-        type="submit"
-        className="mt-2 px-4 py-2 bg-green-500 text-white rounded"
-        disabled={loading}
-      >
+
+      {error && <p className="error">{error}</p>}
+
+      <button type="submit" disabled={loading}>
         {loading ? "Processing..." : "Process Report"}
       </button>
     </form>

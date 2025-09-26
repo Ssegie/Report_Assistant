@@ -1,0 +1,70 @@
+.severity-chart-container {
+  background-color: #e6f4ea; /* light green container */
+  border: 2px solid #34d399; /* green border */
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin: 1rem auto;
+  max-width: 36rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  animation: bounce-slow 3s infinite;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Heading */
+.severity-chart-container h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #065f46;
+  margin-bottom: 1rem;
+}
+
+/* Drug filter */
+.drug-filter {
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.drug-filter label {
+  font-weight: 500;
+  color: #065f46;
+}
+
+.drug-filter select {
+  padding: 0.25rem 0.5rem;
+  border: 2px solid #6ee7b7;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.drug-filter select:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+/* Loading / no data */
+.loading {
+  text-align: center;
+  color: #065f46;
+  font-weight: 500;
+  margin: 1rem 0;
+}
+
+/* Animations */
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .severity-chart-container {
+    padding: 1rem;
+  }
+
+  .severity-chart-container h2 {
+    font-size: 1.25rem;
+  }
+}

@@ -1,0 +1,73 @@
+/* Card container */
+.report-card {
+  background-color: #d1fae5; /* light green */
+  border: 2px solid #6ee7b7; /* green border */
+  border-radius: 1rem; /* rounded corners */
+  padding: 1rem; /* spacing */
+  max-width: 36rem;
+  margin: 1rem auto;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  animation: bounce-slow 3s infinite;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Headings */
+.report-card h3 {
+  font-weight: 700;
+  color: #065f46; /* dark green */
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Paragraphs */
+.report-card p {
+  margin-bottom: 0.25rem;
+}
+
+/* Button group */
+.report-card .button-group {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Buttons */
+.report-card .translate-btn {
+  background-color: #10b981; /* emerald-500 */
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+}
+
+.report-card .translate-btn:hover {
+  background-color: #059669; /* darker emerald */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+}
+
+/* Translations */
+.report-card .translation {
+  margin-top: 0.5rem;
+  color: #065f46; /* green-800 */
+  font-weight: 500;
+}
+
+/* Animations */
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .report-card {
+    padding: 0.75rem;
+  }
+
+  .report-card h3 {
+    font-size: 1rem;
+  }
+}

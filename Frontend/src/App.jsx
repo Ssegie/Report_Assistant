@@ -2,6 +2,7 @@ import { useState } from "react";
 import ReportForm from "./components/ReportForm";
 import ReportCard from "./components/ReportCard";
 import ReportHistory from "./components/ReportHistory";
+import SeverityChart from "./components/SeverityChart";
 
 export default function App() {
   const [latestReport, setLatestReport] = useState(null);
