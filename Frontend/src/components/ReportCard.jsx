@@ -1,28 +1,45 @@
-import React from "react";
+import { useState } from "react";
+import axios from "axios";
 
-export default function ReportCard({result, backend, onTranslate}){
-  async function translate(lang){
-    try{
-      const q = new URLSearchParams({outcome: result.outcome || "", lang});
-      const r = await fetch(`${backend}/translate?${q.toString()}`);
-      const d = await r.json();
-      onTranslate({...result, translated: d.translated});
-    }catch(e){
-      console.error(e);
+export default function ReportCard({ report }) {
+  const [translation, setTranslation] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleTranslate = async () => {
+    setLoading(true);
+    try {
+      // Send both keys, backend can pick whichever it expects
+      const res = await axios.post("http://localhost:8000/api/translate/", {
+        text: report.outcome,
+        outcome: report.outcome,
+        lang: "fr" // or "sw"
+      });
+      setTranslation(res.data.translated || "Translation unavailable");
+    } catch (err) {
+      console.error("Translation error:", err);
+      setTranslation("Translation failed");
+    } finally {
+      setLoading(false);
     }
-  }
-  return (
-    <div className="card">
-      <h3>Processed Result</h3>
-      <div><strong>Drug:</strong> {result.drug || "—"}</div>
-      <div><strong>Adverse Events:</strong> {result.adverse_events.join(", ") || "—"}</div>
-      <div><strong>Severity:</strong> {result.severity || "—"}</div>
-      <div><strong>Outcome:</strong> {result.outcome || "—"} {result.translated && <em> ({result.translated})</em>}</div>
+  };
 
-      <div className="translate-buttons">
-        <button onClick={()=>translate("fr")}>Translate Outcome → French</button>
-        <button onClick={()=>translate("sw")}>Translate Outcome → Swahili</button>
-      </div>
+  return (
+    <div className="border p-4 rounded shadow my-2">
+      <p><strong>Drug:</strong> {report.drug}</p>
+      <p><strong>Adverse Events:</strong> {report.adverse_events.join(", ")}</p>
+      <p><strong>Severity:</strong> {report.severity}</p>
+      <p><strong>Outcome:</strong> {report.outcome}</p>
+      {translation && <p><strong>Translated:</strong> {translation}</p>}
+      <button
+        onClick={handleTranslate}
+        disabled={loading}
+        className="mt-2 px-2 py-1 bg-blue-500 text-white rounded"
+      >
+        {loading ? "Translating..." : "Translate Outcome"}
+      </button>
+      <p className="text-gray-500 text-sm">
+        {new Date(report.created_at).toLocaleString()}
+      </p>
     </div>
   );
 }
