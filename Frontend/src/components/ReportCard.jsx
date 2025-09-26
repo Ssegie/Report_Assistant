@@ -2,24 +2,25 @@ import { useState } from "react";
 import axios from "axios";
 
 export default function ReportCard({ report }) {
-  const [translation, setTranslation] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [translations, setTranslations] = useState({});
+  const [loadingLang, setLoadingLang] = useState("");
 
-  const handleTranslate = async () => {
-    setLoading(true);
+  const handleTranslate = async (lang) => {
+    setLoadingLang(lang);
     try {
-      // Send both keys, backend can pick whichever it expects
       const res = await axios.post("http://localhost:8000/api/translate/", {
-        text: report.outcome,
         outcome: report.outcome,
-        lang: "fr" // or "sw"
+        lang: lang,
       });
-      setTranslation(res.data.translated || "Translation unavailable");
+      setTranslations((prev) => ({
+        ...prev,
+        [lang]: res.data.translated,
+      }));
     } catch (err) {
-      console.error("Translation error:", err);
-      setTranslation("Translation failed");
+      console.error(err);
+      alert("Translation failed. Please try again.");
     } finally {
-      setLoading(false);
+      setLoadingLang("");
     }
   };
 
@@ -29,17 +30,33 @@ export default function ReportCard({ report }) {
       <p><strong>Adverse Events:</strong> {report.adverse_events.join(", ")}</p>
       <p><strong>Severity:</strong> {report.severity}</p>
       <p><strong>Outcome:</strong> {report.outcome}</p>
-      {translation && <p><strong>Translated:</strong> {translation}</p>}
-      <button
-        onClick={handleTranslate}
-        disabled={loading}
-        className="mt-2 px-2 py-1 bg-blue-500 text-white rounded"
-      >
-        {loading ? "Translating..." : "Translate Outcome"}
-      </button>
-      <p className="text-gray-500 text-sm">
-        {new Date(report.created_at).toLocaleString()}
-      </p>
+
+      <div className="mt-2 flex gap-2">
+        <button
+          onClick={() => handleTranslate("fr")}
+          disabled={loadingLang === "fr"}
+          className="px-2 py-1 bg-blue-500 text-white rounded"
+        >
+          {loadingLang === "fr" ? "Translating to French..." : "Translate to French"}
+        </button>
+
+        <button
+          onClick={() => handleTranslate("sw")}
+          disabled={loadingLang === "sw"}
+          className="px-2 py-1 bg-green-500 text-white rounded"
+        >
+          {loadingLang === "sw" ? "Translating to Kiswahili..." : "Translate to Kiswahili"}
+        </button>
+      </div>
+
+      {translations.fr && (
+        <p className="mt-2"><strong>French:</strong> {translations.fr}</p>
+      )}
+      {translations.sw && (
+        <p className="mt-2"><strong>Kiswahili:</strong> {translations.sw}</p>
+      )}
+
+      <p className="text-gray-500 text-sm mt-2">{new Date(report.created_at).toLocaleString()}</p>
     </div>
   );
 }

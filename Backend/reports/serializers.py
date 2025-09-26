@@ -5,7 +5,17 @@ class ReportSerializer(serializers.ModelSerializer):
     adverse_events = serializers.ListField(
         child=serializers.CharField(), source="adverse_events_list", read_only=True
     )
+    file = serializers.FileField(read_only=True)  # add file field
 
     class Meta:
         model = Report
-        fields = ["id", "original", "drug", "adverse_events", "severity", "outcome", "created_at"]
+        fields = [
+            "id",
+            "original",
+            "drug",
+            "adverse_events",
+            "severity",
+            "outcome",
+            "file",         # include file in serialized output
+            "created_at",
+        ]

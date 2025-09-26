@@ -4,22 +4,44 @@ import ReportCard from "./ReportCard";
 
 export default function ReportHistory() {
   const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchReports = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await axios.get("http://localhost:8000/api/reports/");
+      // Ensure adverse_events is always an array
+      const normalizedReports = res.data.map((r) => ({
+        ...r,
+        adverse_events: Array.isArray(r.adverse_events)
+          ? r.adverse_events
+          : r.adverse_events
+          ? r.adverse_events.split(",")
+          : [],
+      }));
+      setReports(normalizedReports);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch reports.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/reports/")
-      .then(res => setReports(res.data))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
+    fetchReports();
   }, []);
 
-  if (loading) return <p>Loading history...</p>;
-  if (reports.length === 0) return <p>No reports yet.</p>;
+  if (loading) return <p>Loading reports...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
+  if (!reports.length) return <p>No reports found.</p>;
 
   return (
     <div>
-      {reports.map(r => (
-        <ReportCard key={r.id} report={r} />
+      {reports.map((report) => (
+        <ReportCard key={report.id} report={report} />
       ))}
     </div>
   );

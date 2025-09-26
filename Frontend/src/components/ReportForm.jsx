@@ -3,6 +3,7 @@ import axios from "axios";
 
 export default function ReportForm({ onReportProcessed }) {
   const [reportText, setReportText] = useState("");
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -14,11 +15,17 @@ export default function ReportForm({ onReportProcessed }) {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:8000/api/process-report/", {
-        report: reportText,
+      const formData = new FormData();
+      formData.append("report", reportText);
+      if (file) formData.append("file", file);
+
+      const res = await axios.post("http://localhost:8000/api/process-report/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
+
       onReportProcessed(res.data);
-      setReportText(""); // clear input
+      setReportText("");
+      setFile(null);
     } catch (err) {
       console.error(err);
       setError("Failed to process report");
@@ -35,6 +42,11 @@ export default function ReportForm({ onReportProcessed }) {
         value={reportText}
         onChange={(e) => setReportText(e.target.value)}
         className="w-full p-2 border rounded"
+      />
+      <input
+        type="file"
+        onChange={(e) => setFile(e.target.files[0])}
+        className="mt-2"
       />
       {error && <p className="text-red-500 mt-2">{error}</p>}
       <button
