@@ -1,34 +1,24 @@
 import re
 
-COMMON_ADVERSE_EVENTS = ["nausea","headache","dizziness","rash","fatigue","vomiting","fever","diarrhea","pain","insomnia"]
+def process_report_text(text: str):
+    drug_match = re.search(r"\bDrug\s+([A-Z]\w*)", text)
+    drug = drug_match.group(0) if drug_match else None
 
-SEVERITY_KEYWORDS = {
-    "severe": ["severe","serious","intense","critical"],
-    "moderate": ["moderate","significant"],
-    "mild": ["mild","slight","minor"]
-}
+    # simple adverse event detection
+    events = []
+    for ev in ["nausea", "headache", "dizziness", "fever", "rash"]:
+        if ev in text.lower():
+            events.append(ev)
 
-OUTCOME_KEYWORDS = {
-    "recovered": ["recovered","resolved","improved"],
-    "ongoing": ["ongoing","persisting","stable"],
-    "fatal": ["died","death","fatal"]
-}
+    severity_match = re.search(r"\b(mild|moderate|severe)\b", text.lower())
+    severity = severity_match.group(0) if severity_match else None
 
-def extract_drug(text):
-    m = re.search(r"\bDrug\s+[A-Za-z0-9\-]+", text)
-    return m.group(0) if m else None
+    outcome_match = re.search(r"\b(recovered|ongoing|fatal)\b", text.lower())
+    outcome = outcome_match.group(0) if outcome_match else None
 
-def extract_adverse_events(text):
-    return [ev for ev in COMMON_ADVERSE_EVENTS if ev in text.lower()]
-
-def detect_severity(text):
-    for sev, words in SEVERITY_KEYWORDS.items():
-        if any(w in text.lower() for w in words):
-            return sev
-    return "moderate"
-
-def detect_outcome(text):
-    for oc, words in OUTCOME_KEYWORDS.items():
-        if any(w in text.lower() for w in words):
-            return oc
-    return "unknown"
+    return {
+        "drug": drug,
+        "adverse_events": events,
+        "severity": severity,
+        "outcome": outcome,
+    }

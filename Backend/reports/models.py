@@ -1,12 +1,12 @@
 from django.db import models
 
-# Create your models here.
-from django.db import models
-
 class Report(models.Model):
     original = models.TextField()
-    drug = models.CharField(max_length=100, blank=True)
-    adverse_events = models.TextField(blank=True)  # comma-separated
-    severity = models.CharField(max_length=50, blank=True)
-    outcome = models.CharField(max_length=50, blank=True)
+    drug = models.CharField(max_length=100, null=True, blank=True)
+    adverse_events = models.TextField(null=True, blank=True)  # store comma-separated list
+    severity = models.CharField(max_length=50, null=True, blank=True)
+    outcome = models.CharField(max_length=50, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def adverse_events_list(self):
+        return self.adverse_events.split(",") if self.adverse_events else []
