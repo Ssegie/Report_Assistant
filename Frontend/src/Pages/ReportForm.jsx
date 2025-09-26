@@ -4,9 +4,10 @@ import './ReportForm.css';
 
 export default function ReportForm({ onReportProcessed }) {
   const [drug, setDrug] = useState("");
-  const [adverseEvent, setAdverseEvent] = useState(""); // single value now
+  const [adverseEvent, setAdverseEvent] = useState("");
   const [severity, setSeverity] = useState("");
   const [outcome, setOutcome] = useState("");
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -23,18 +24,29 @@ export default function ReportForm({ onReportProcessed }) {
 
     setLoading(true);
     setError("");
+
     try {
-      const res = await axios.post("http://localhost:8000/api/process-report/", {
-        drug,
-        adverse_events: [adverseEvent], // keep API expecting array
-        severity,
-        outcome,
-      });
+      const formData = new FormData();
+      formData.append("drug", drug);
+      formData.append("adverse_events", adverseEvent); // single value, backend can split
+      formData.append("severity", severity);
+      formData.append("outcome", outcome);
+      if (file) formData.append("file", file);
+
+      const res = await axios.post(
+        "http://localhost:8000/api/process-report/",
+        formData,
+        { headers: { "Content-Type": "multipart/form-data" } }
+      );
+
       onReportProcessed(res.data);
+
+      // Reset form
       setDrug("");
       setAdverseEvent("");
       setSeverity("");
       setOutcome("");
+      setFile(null);
     } catch (err) {
       console.error(err);
       setError("Failed to submit report");
@@ -47,7 +59,6 @@ export default function ReportForm({ onReportProcessed }) {
     <div className="register-container">
       <h2 className="register-header">Submit Medical Report</h2>
       <form className="register-form" onSubmit={handleSubmit}>
-        {/* Drug input */}
         <label>Drug Name</label>
         <input
           type="text"
@@ -56,7 +67,6 @@ export default function ReportForm({ onReportProcessed }) {
           onChange={(e) => setDrug(e.target.value)}
         />
 
-        {/* Adverse Event dropdown */}
         <label>Adverse Event</label>
         <select
           value={adverseEvent}
@@ -68,7 +78,6 @@ export default function ReportForm({ onReportProcessed }) {
           ))}
         </select>
 
-        {/* Severity dropdown */}
         <label>Severity</label>
         <select value={severity} onChange={(e) => setSeverity(e.target.value)}>
           <option value="">Select severity</option>
@@ -77,7 +86,6 @@ export default function ReportForm({ onReportProcessed }) {
           ))}
         </select>
 
-        {/* Outcome dropdown */}
         <label>Outcome</label>
         <select value={outcome} onChange={(e) => setOutcome(e.target.value)}>
           <option value="">Select outcome</option>
@@ -85,6 +93,12 @@ export default function ReportForm({ onReportProcessed }) {
             <option key={o} value={o}>{o}</option>
           ))}
         </select>
+
+        <label>Attach File (optional)</label>
+        <input
+          type="file"
+          onChange={(e) => setFile(e.target.files[0])}
+        />
 
         {error && <p className="error-message">{error}</p>}
 
