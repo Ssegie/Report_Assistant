@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, NavLink } from "react-router-dom";
 import ReportForm from "./Pages/ReportForm";
 import ReportHistory from "./Pages/ReportHistory";
 import SeverityChart from "./Pages/SeverityChart";
@@ -9,17 +9,41 @@ export default function App() {
 
   return (
     <Router>
-      <div className="flex h-screen">
+      <div className="app-container flex h-screen w-screen overflow-hidden">
         {/* Sidebar */}
-        <aside className="w-64 bg-green-600 text-white p-6 flex flex-col gap-4">
-          <h1 className="text-2xl font-bold mb-4">Medical Reports</h1>
-          <Link to="/" className="hover:underline">Submit Report</Link>
-          <Link to="/history" className="hover:underline">Report History</Link>
-          <Link to="/severity" className="hover:underline">Severity Chart</Link>
+        <aside className="sidebar flex-shrink-0">
+          <h1 className="sidebar-title">Medical Reports</h1>
+          <nav className="sidebar-nav flex flex-col gap-2">
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? "active" : ""}`
+              }
+            >
+              Submit Report
+            </NavLink>
+            <NavLink
+              to="/history"
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? "active" : ""}`
+              }
+            >
+              Report History
+            </NavLink>
+            <NavLink
+              to="/severity"
+              className={({ isActive }) =>
+                `sidebar-link ${isActive ? "active" : ""}`
+              }
+            >
+              Severity Chart
+            </NavLink>
+          </nav>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6 overflow-auto bg-gray-100">
+        <main className="main-content flex-1 overflow-auto p-6">
           <Routes>
             <Route
               path="/"
@@ -29,16 +53,14 @@ export default function App() {
             <Route path="/severity" element={<SeverityChart />} />
           </Routes>
 
-          {/* Latest report can still appear on the form page */}
+          {/* Latest report preview on form page */}
           {latestReport && (
-            <div className="mt-6">
-              <h2 className="text-xl font-semibold">Latest Report</h2>
-              <div className="p-4 bg-white shadow rounded">
-                <p><strong>Drug:</strong> {latestReport.drug}</p>
-                <p><strong>Adverse Events:</strong> {latestReport.adverse_events.join(", ")}</p>
-                <p><strong>Severity:</strong> {latestReport.severity}</p>
-                <p><strong>Outcome:</strong> {latestReport.outcome}</p>
-              </div>
+            <div className="latest-report-container mt-6 p-6 bg-green-600 text-white rounded shadow">
+              <h2 className="text-xl font-semibold mb-2">Latest Report</h2>
+              <p><strong>Drug:</strong> {latestReport.drug}</p>
+              <p><strong>Adverse Events:</strong> {latestReport.adverse_events.join(", ")}</p>
+              <p><strong>Severity:</strong> {latestReport.severity}</p>
+              <p><strong>Outcome:</strong> {latestReport.outcome}</p>
             </div>
           )}
         </main>
