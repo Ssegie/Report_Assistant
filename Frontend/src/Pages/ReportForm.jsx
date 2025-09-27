@@ -1,12 +1,13 @@
 import { useState } from "react";
 import axios from "axios";
-import './ReportForm.css'; 
+import "./ReportForm.css";
 
 export default function ReportForm({ onReportProcessed }) {
   const [drug, setDrug] = useState("");
   const [adverseEvent, setAdverseEvent] = useState("");
   const [severity, setSeverity] = useState("");
   const [outcome, setOutcome] = useState("");
+  const [reportText, setReportText] = useState(""); // ✅ free text mode
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -17,22 +18,32 @@ export default function ReportForm({ onReportProcessed }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!drug.trim()) return setError("Drug name is required");
-    if (!adverseEvent) return setError("Select an adverse event");
-    if (!severity) return setError("Select severity");
-    if (!outcome) return setError("Select outcome");
-
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
       const formData = new FormData();
-      formData.append("drug", drug);
-      formData.append("adverse_events", adverseEvent); // supports comma-separated
-      formData.append("severity", severity);
-      formData.append("outcome", outcome);
-      if (file) formData.append("file", file);
+
+      if (drug && adverseEvent && severity && outcome) {
+        // ✅ Structured submission
+        formData.append("drug", drug);
+        formData.append("adverse_events", adverseEvent);
+        formData.append("severity", severity);
+        formData.append("outcome", outcome);
+      } else if (reportText.trim() || file) {
+        // ✅ Free-text submission (backend will parse)
+        if (reportText.trim()) {
+          formData.append("report_text", reportText);
+        }
+      } else {
+        setError("Please fill structured fields or provide a report text/file");
+        setLoading(false);
+        return;
+      }
+
+      if (file) {
+        formData.append("file", file);
+      }
 
       const res = await axios.post(
         "https://report-assistant.onrender.com/api/process-report/",
@@ -47,12 +58,11 @@ export default function ReportForm({ onReportProcessed }) {
       setAdverseEvent("");
       setSeverity("");
       setOutcome("");
+      setReportText("");
       setFile(null);
     } catch (err) {
       console.error(err);
-      setError(
-        err.response?.data?.error || "Failed to submit report"
-      );
+      setError(err.response?.data?.error || "Failed to submit report");
     } finally {
       setLoading(false);
     }
@@ -77,7 +87,9 @@ export default function ReportForm({ onReportProcessed }) {
         >
           <option value="">Select an adverse event</option>
           {adverseOptions.map((ae) => (
-            <option key={ae} value={ae}>{ae}</option>
+            <option key={ae} value={ae}>
+              {ae}
+            </option>
           ))}
         </select>
 
@@ -85,7 +97,9 @@ export default function ReportForm({ onReportProcessed }) {
         <select value={severity} onChange={(e) => setSeverity(e.target.value)}>
           <option value="">Select severity</option>
           {severityOptions.map((s) => (
-            <option key={s} value={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>
 
@@ -93,15 +107,21 @@ export default function ReportForm({ onReportProcessed }) {
         <select value={outcome} onChange={(e) => setOutcome(e.target.value)}>
           <option value="">Select outcome</option>
           {outcomeOptions.map((o) => (
-            <option key={o} value={o}>{o}</option>
+            <option key={o} value={o}>
+              {o}
+            </option>
           ))}
         </select>
 
-        <label>Attach File (optional)</label>
-        <input
-          type="file"
-          onChange={(e) => setFile(e.target.files[0])}
+        <label>Or Paste Full Report Text</label>
+        <textarea
+          placeholder="Paste full report here if you don’t want to fill individual fields"
+          value={reportText}
+          onChange={(e) => setReportText(e.target.value)}
         />
+
+        <label>Attach File (optional)</label>
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
 
         {error && <p className="error-message">{error}</p>}
 

@@ -13,7 +13,7 @@ def process_report(request):
     """
     Accepts either:
     1. Structured form data (drug, adverse_events, severity, outcome, optional file)
-    2. Raw text report + optional file
+    2. Raw text report (report_text or report) + optional file
     """
 
     # Structured fields
@@ -22,11 +22,11 @@ def process_report(request):
     severity = request.data.get("severity")
     outcome = request.data.get("outcome")
 
-    # Optional uploaded file
+    # Uploaded file (optional)
     uploaded_file = request.FILES.get("file")
-    text = request.data.get("report", "")
+    text = request.data.get("report_text") or request.data.get("report") or ""
 
-    # Extract text from file if uploaded
+    # Extract text from uploaded file
     if uploaded_file:
         try:
             if uploaded_file.content_type == "text/plain":
@@ -49,7 +49,7 @@ def process_report(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    # Normalize adverse_events to a list
+    # Normalize adverse_events into a list
     if isinstance(adverse_events, str):
         adverse_events_list = [e.strip() for e in adverse_events.split(",") if e.strip()]
     elif isinstance(adverse_events, list):
@@ -67,20 +67,20 @@ def process_report(request):
             outcome=outcome,
             file=uploaded_file if uploaded_file else None,
         )
-        return Response(ReportSerializer(report).data)
+        return Response(ReportSerializer(report).data, status=status.HTTP_201_CREATED)
 
-    # Case 2: Only text (from file or manual input)
+    # Case 2: Free text (from textarea or file)
     if text.strip():
-        data = process_report_text(text)
+        extracted = process_report_text(text)
         report = Report.objects.create(
             original=text,
-            drug=data.get("drug", ""),
-            adverse_events=",".join(data.get("adverse_events", [])),
-            severity=data.get("severity", ""),
-            outcome=data.get("outcome", ""),
+            drug=extracted.get("drug") or "Unknown",
+            adverse_events=",".join(extracted.get("adverse_events", [])),
+            severity=extracted.get("severity") or "unspecified",
+            outcome=extracted.get("outcome") or "unspecified",
             file=uploaded_file if uploaded_file else None,
         )
-        return Response(ReportSerializer(report).data)
+        return Response(ReportSerializer(report).data, status=status.HTTP_201_CREATED)
 
     return Response({"error": "Invalid submission"}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -93,13 +93,16 @@ def list_reports(request):
 
 @api_view(["POST"])
 def translate_outcome(request):
-    # Accept either 'outcome' or 'text' key from frontend
+    """
+    Translate an outcome or free text into a target language (default: Spanish).
+    """
     text = request.data.get("outcome") or request.data.get("text")
-    target_lang = request.data.get("lang", "es")  # default Spanish
+    target_lang = request.data.get("lang", "es")
 
     if not text:
         return Response(
-            {"error": "Outcome text is required"}, status=status.HTTP_400_BAD_REQUEST
+            {"error": "Outcome text is required"},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
     try:
@@ -108,4 +111,7 @@ def translate_outcome(request):
             {"original": text, "translated": translated, "lang": target_lang}
         )
     except Exception as e:
-        return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(
+            {"error": str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
