@@ -2,12 +2,6 @@ import { useState } from "react";
 import axios from "axios";
 import "./ReportForm.css";
 
-// Axios instance
-const api = axios.create({
-  baseURL: "https://report-assistant.onrender.com/api",
-  timeout: 20000,
-});
-
 export default function ReportForm({ onReportProcessed }) {
   const [drug, setDrug] = useState("");
   const [adverseEvent, setAdverseEvent] = useState("");
@@ -31,16 +25,18 @@ export default function ReportForm({ onReportProcessed }) {
     try {
       const formData = new FormData();
 
-      // Structured submission (all fields must be filled)
+      // Structured submission
       if (drug && adverseEvent && severity && outcome) {
         formData.append("drug", drug);
-        formData.append("adverse_events", adverseEvent); // ✅ plural, matches backend
+        formData.append("adverse_events", adverseEvent); // ✅ plural
         formData.append("severity", severity);
         formData.append("outcome", outcome);
-      } else if (reportText.trim() || file) {
-        // Free-text submission
+      } 
+      // Free-text submission (from textarea or file)
+      else if (reportText.trim() || file) {
         if (reportText.trim()) formData.append("report_text", reportText);
-      } else {
+      } 
+      else {
         setError("Please fill all structured fields OR provide report text/file");
         setLoading(false);
         return;
@@ -48,13 +44,17 @@ export default function ReportForm({ onReportProcessed }) {
 
       if (file) formData.append("file", file);
 
-      // 🔍 DEBUG: log all FormData before sending
+      // 🔍 DEBUG: log all FormData keys/values
       console.log("🚀 Sending FormData:");
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
 
-      const res = await api.post("/process-report/", formData);
+      const res = await axios.post(
+        "https://report-assistant.onrender.com/api/process-report/",
+        formData,
+        { timeout: 20000 }
+      );
 
       onReportProcessed(res.data);
 
