@@ -51,7 +51,7 @@ export default function ReportForm({ onReportProcessed }) {
       }
 
       const res = await axios.post(
-        "https://report-assistant.onrender.com/api/process-report/",
+        "https://report-assistant.onrender.com/process-report/",
         formData,
         { timeout: 20000 }
       );

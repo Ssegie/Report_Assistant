@@ -23,7 +23,7 @@ export default function SeverityChart() {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://report-assistant.onrender.com/api/reports/");
+      const res = await axios.get("https://report-assistant.onrender.com/reports/");
       const reports = res.data || [];
 
       setAllReports(reports);
