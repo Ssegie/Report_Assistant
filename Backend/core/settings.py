@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------
 # SECURITY
 # ------------------------------
-SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "replace-this-with-your-own-secret-key")
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "6bx_&ibie0g(srd^l2iocslu955ul6fw3n91xu3z2pfev4tut_")
 DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
@@ -128,10 +128,23 @@ REST_FRAMEWORK = {
 # ------------------------------
 # CORS CONFIGURATION
 # ------------------------------
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",                  # Local frontend (Vite)
-    "https://report-assistant-umber.vercel.app",  # Deployed frontend
-]
+
 
 # Optional: for testing only (allow all origins temporarily)
 # CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "https://report-assistant-umber.vercel.app",
+]
+
+# Optional: allow all headers and credentials
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'content-type',
+    'authorization',
+    'x-csrftoken',
+    'accept',
+    'origin',
+    'user-agent',
+    'accept-encoding',
+    'x-requested-with',
+]
