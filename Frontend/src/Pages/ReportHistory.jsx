@@ -1,6 +1,5 @@
-import { api } from "../api"; // at top
 import { useEffect, useState } from "react";
-import axios from "axios";
+import { api } from "../api";
 import ReportCard from "../components/ReportCard";
 
 export default function ReportHistory() {
@@ -13,27 +12,20 @@ export default function ReportHistory() {
     setError(null);
     try {
       const res = await api.get("/reports/");
-      // Ensure adverse_events is always an array
-      const normalizedReports = res.data.map((r) => ({
+      const normalizedReports = res.data.map(r => ({
         ...r,
         adverse_events: Array.isArray(r.adverse_events)
           ? r.adverse_events
-          : r.adverse_events
-          ? r.adverse_events.split(",")
-          : [],
+          : r.adverse_events ? r.adverse_events.split(",") : [],
       }));
       setReports(normalizedReports);
     } catch (err) {
       console.error(err);
       setError("Failed to fetch reports.");
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  useEffect(() => {
-    fetchReports();
-  }, []);
+  useEffect(() => { fetchReports(); }, []);
 
   if (loading) return <p>Loading reports...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
@@ -41,9 +33,7 @@ export default function ReportHistory() {
 
   return (
     <div>
-      {reports.map((report) => (
-        <ReportCard key={report.id} report={report} />
-      ))}
+      {reports.map(report => <ReportCard key={report.id} report={report} />)}
     </div>
   );
 }
