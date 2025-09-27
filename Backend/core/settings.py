@@ -16,7 +16,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-u!4tmq3sg$ujds2k836gbu*!7-k=wzrdtj-uy#4@8gedy*jkcp'
 DEBUG = True
 
-ALLOWED_HOSTS = ["report-assistant.onrender.com"]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "report-assistant.onrender.com",  # ✅ add your Render domain here
+]
 
 
 # ------------------------------

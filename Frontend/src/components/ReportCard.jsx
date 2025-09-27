@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import './ReportCard.css'; // Import the CSS
+import './ReportCard.css';
 
 export default function ReportCard({ report }) {
   const [translation, setTranslation] = useState({});
@@ -20,7 +20,7 @@ export default function ReportCard({ report }) {
   return (
     <div className="report-card">
       <h3>Drug: {report.drug}</h3>
-      <p><strong>Adverse Events:</strong> {report.adverse_events.join(", ")}</p>
+      <p><strong>Adverse Event:</strong> {report.adverse_event}</p>
       <p><strong>Severity:</strong> {report.severity}</p>
       <p><strong>Outcome:</strong> {report.outcome}</p>
 
@@ -33,8 +33,12 @@ export default function ReportCard({ report }) {
         </button>
       </div>
 
-      {translation.fr && <p className="translation"><strong>French:</strong> {translation.fr}</p>}
-      {translation.sw && <p className="translation"><strong>Kiswahili:</strong> {translation.sw}</p>}
+      {translation.fr && (
+        <p className="translation"><strong>French:</strong> {translation.fr}</p>
+      )}
+      {translation.sw && (
+        <p className="translation"><strong>Kiswahili:</strong> {translation.sw}</p>
+      )}
     </div>
   );
 }

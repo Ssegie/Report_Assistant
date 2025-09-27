@@ -7,7 +7,7 @@ export default function ReportForm({ onReportProcessed }) {
   const [adverseEvent, setAdverseEvent] = useState("");
   const [severity, setSeverity] = useState("");
   const [outcome, setOutcome] = useState("");
-  const [reportText, setReportText] = useState(""); // ✅ free text mode
+  const [reportText, setReportText] = useState(""); 
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -27,11 +27,11 @@ export default function ReportForm({ onReportProcessed }) {
       if (drug && adverseEvent && severity && outcome) {
         // ✅ Structured submission
         formData.append("drug", drug);
-        formData.append("adverse_events", adverseEvent);
+        formData.append("adverse_event", adverseEvent); // singular key
         formData.append("severity", severity);
         formData.append("outcome", outcome);
       } else if (reportText.trim() || file) {
-        // ✅ Free-text submission (backend will parse)
+        // ✅ Free-text submission
         if (reportText.trim()) {
           formData.append("report_text", reportText);
         }
@@ -61,7 +61,7 @@ export default function ReportForm({ onReportProcessed }) {
       setReportText("");
       setFile(null);
     } catch (err) {
-      console.error(err);
+      console.error("❌ Backend error:", err.response?.data || err.message);
       setError(err.response?.data?.error || "Failed to submit report");
     } finally {
       setLoading(false);
