@@ -26,7 +26,7 @@ def process_report(request):
     uploaded_file = request.FILES.get("file")
     text = request.data.get("report", "")
 
-    # If file uploaded, try to extract text
+    # Extract text from file if uploaded
     if uploaded_file:
         try:
             if uploaded_file.content_type == "text/plain":
@@ -49,19 +49,27 @@ def process_report(request):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-    # ✅ Case 1: Structured form data exists → save directly
-    if drug and adverse_events and severity and outcome:
+    # Normalize adverse_events to a list
+    if isinstance(adverse_events, str):
+        adverse_events_list = [e.strip() for e in adverse_events.split(",") if e.strip()]
+    elif isinstance(adverse_events, list):
+        adverse_events_list = adverse_events
+    else:
+        adverse_events_list = []
+
+    # Case 1: Structured form data
+    if drug and adverse_events_list and severity and outcome:
         report = Report.objects.create(
             original=text or "Submitted via form",
             drug=drug,
-            adverse_events=adverse_events,
+            adverse_events=",".join(adverse_events_list),
             severity=severity,
             outcome=outcome,
             file=uploaded_file if uploaded_file else None,
         )
         return Response(ReportSerializer(report).data)
 
-    # ✅ Case 2: Only text (from file or manual input)
+    # Case 2: Only text (from file or manual input)
     if text.strip():
         data = process_report_text(text)
         report = Report.objects.create(

@@ -17,6 +17,7 @@ export default function ReportForm({ onReportProcessed }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!drug.trim()) return setError("Drug name is required");
     if (!adverseEvent) return setError("Select an adverse event");
     if (!severity) return setError("Select severity");
@@ -28,7 +29,7 @@ export default function ReportForm({ onReportProcessed }) {
     try {
       const formData = new FormData();
       formData.append("drug", drug);
-      formData.append("adverse_events", adverseEvent); // single value, backend can split
+      formData.append("adverse_events", adverseEvent); // supports comma-separated
       formData.append("severity", severity);
       formData.append("outcome", outcome);
       if (file) formData.append("file", file);
@@ -49,7 +50,9 @@ export default function ReportForm({ onReportProcessed }) {
       setFile(null);
     } catch (err) {
       console.error(err);
-      setError("Failed to submit report");
+      setError(
+        err.response?.data?.error || "Failed to submit report"
+      );
     } finally {
       setLoading(false);
     }
