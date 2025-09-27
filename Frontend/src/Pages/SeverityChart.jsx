@@ -1,6 +1,9 @@
+import { api } from "../api"; // at top
 import { useEffect, useState } from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
-import { api } from "../api";
+import axios from "axios";
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
+} from "recharts";
 import './SeverityChart.css';
 
 export default function SeverityChart() {
@@ -10,32 +13,51 @@ export default function SeverityChart() {
   const [selectedDrug, setSelectedDrug] = useState("All");
   const [allReports, setAllReports] = useState([]);
 
-  useEffect(() => { fetchReports(); }, []);
-  useEffect(() => { if (allReports.length) updateChartData(); }, [selectedDrug, allReports]);
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  useEffect(() => {
+    if (allReports.length) updateChartData();
+  }, [selectedDrug, allReports]);
 
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/reports/");
+      const res = await axios.get("https://report-assistant.onrender.com/reports/");
       const reports = res.data || [];
+
       setAllReports(reports);
 
+      // Extract unique drugs
       const uniqueDrugs = Array.from(new Set(reports.map(r => r.drug || "Unknown")));
       setDrugs(["All", ...uniqueDrugs]);
     } catch (err) {
       console.error("Failed to fetch reports for chart", err);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateChartData = () => {
-    const filteredReports = selectedDrug === "All" ? allReports : allReports.filter(r => r.drug === selectedDrug);
+    const filteredReports = selectedDrug === "All" 
+      ? allReports 
+      : allReports.filter(r => r.drug === selectedDrug);
+
     const severityOrder = ["Mild", "Moderate", "Severe", "Unknown"];
-    const severityCount = filteredReports.reduce((acc, r) => {
-      const sev = r.severity || "Unknown";
+
+    const severityCount = filteredReports.reduce((acc, report) => {
+      const sev = report.severity || "Unknown";
       acc[sev] = (acc[sev] || 0) + 1;
       return acc;
     }, {});
-    setData(severityOrder.map(sev => ({ severity: sev, count: severityCount[sev] || 0 })));
+
+    const chartData = severityOrder.map(sev => ({
+      severity: sev,
+      count: severityCount[sev] || 0,
+    }));
+
+    setData(chartData);
   };
 
   if (loading) return <p className="loading">Loading chart...</p>;
@@ -47,8 +69,13 @@ export default function SeverityChart() {
 
       <div className="drug-filter">
         <label>Filter by Drug:</label>
-        <select value={selectedDrug} onChange={e => setSelectedDrug(e.target.value)}>
-          {drugs.map(drug => <option key={drug} value={drug}>{drug}</option>)}
+        <select
+          value={selectedDrug}
+          onChange={(e) => setSelectedDrug(e.target.value)}
+        >
+          {drugs.map(drug => (
+            <option key={drug} value={drug}>{drug}</option>
+          ))}
         </select>
       </div>
 
