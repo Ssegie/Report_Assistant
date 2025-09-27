@@ -7,7 +7,7 @@ export default function ReportCard({ report }) {
 
   const handleTranslate = async (lang) => {
     try {
-      const res = await axios.post("https://report-assistant.onrender.com/translate/", {
+      const res = await api.post("/translate/", {
         outcome: report.outcome, // matches backend
         lang,
       });

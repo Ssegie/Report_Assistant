@@ -1,8 +1,5 @@
-import axios from "axios";
+import { create } from "apisauce";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-export const api = axios.create({
-  baseURL: API_URL,
-  timeout: 20000,
+export const api = create({
+  baseURL: import.meta.env.VITE_API_URL || "https://report-assistant.onrender.com",
 });
