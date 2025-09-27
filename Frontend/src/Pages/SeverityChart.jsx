@@ -18,7 +18,7 @@ export default function SeverityChart() {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:8000/api/reports/");
+      const res = await axios.get("https://report-assistant.onrender.com/api/reports/");
       const reports = res.data;
 
       // Extract unique drugs

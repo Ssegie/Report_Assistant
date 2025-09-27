@@ -34,7 +34,7 @@ export default function ReportForm({ onReportProcessed }) {
       if (file) formData.append("file", file);
 
       const res = await axios.post(
-        "http://localhost:8000/api/process-report/",
+        "https://report-assistant.onrender.com/api/process-report/",
         formData,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

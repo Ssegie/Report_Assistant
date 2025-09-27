@@ -11,7 +11,7 @@ export default function ReportHistory() {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get("http://localhost:8000/api/reports/");
+      const res = await axios.get("https://report-assistant.onrender.com/api/reports/");
       // Ensure adverse_events is always an array
       const normalizedReports = res.data.map((r) => ({
         ...r,
