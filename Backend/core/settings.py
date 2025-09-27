@@ -19,8 +19,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "report-assistant.onrender.com/",
-    "www.report-assistant.onrender.com",  # optional if you use www
+    "report-assistant.onrender.com",  
 ]
 
 
