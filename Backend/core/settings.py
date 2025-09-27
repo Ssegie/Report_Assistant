@@ -1,9 +1,9 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
-
-# Load environment variables from .env
-
+# Load environment variables from .env (optional on Render)
+load_dotenv()
 
 # ------------------------------
 # BASE DIRECTORY
@@ -13,16 +13,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ------------------------------
 # SECURITY
 # ------------------------------
-SECRET_KEY = 'django-insecure-u!4tmq3sg$ujds2k836gbu*!7-k=wzrdtj-uy#4@8gedy*jkcp'
-DEBUG = True
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "replace-this-with-your-own-secret-key")
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "report-assistant.onrender.com",  
+    "report-assistant.onrender.com",
 ]
-
-
 
 # ------------------------------
 # APPLICATION DEFINITION
@@ -34,8 +32,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Third-party apps
+
+    # Third-party
     'rest_framework',
     'corsheaders',
 
@@ -47,7 +45,7 @@ INSTALLED_APPS = [
 # MIDDLEWARE
 # ------------------------------
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # Must be at the top
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -84,7 +82,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # ------------------------------
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Change to Postgres or MySQL if needed
+        'ENGINE': 'django.db.backends.sqlite3',  # Or Postgres on Render
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
@@ -131,6 +129,9 @@ REST_FRAMEWORK = {
 # CORS CONFIGURATION
 # ------------------------------
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Local dev frontend
+    "http://localhost:5173",                  # Local frontend (Vite)
     "https://report-assistant-umber.vercel.app",  # Deployed frontend
 ]
+
+# Optional: for testing only (allow all origins temporarily)
+# CORS_ALLOW_ALL_ORIGINS = True
