@@ -1,3 +1,4 @@
+import { api } from "../api"; // at top
 import { useEffect, useState } from "react";
 import axios from "axios";
 import ReportCard from "../components/ReportCard";
@@ -11,7 +12,7 @@ export default function ReportHistory() {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get("https://report-assistant.onrender.com/reports/");
+      const res = await api.get("/reports/");
       // Ensure adverse_events is always an array
       const normalizedReports = res.data.map((r) => ({
         ...r,

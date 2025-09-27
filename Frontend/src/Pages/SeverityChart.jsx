@@ -1,3 +1,4 @@
+import { api } from "../api"; // at top
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -23,7 +24,7 @@ export default function SeverityChart() {
   const fetchReports = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://report-assistant.onrender.com/reports/");
+      const res = await api.get("/reports/");
       const reports = res.data || [];
 
       setAllReports(reports);
