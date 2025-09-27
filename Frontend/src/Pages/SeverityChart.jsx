@@ -3,49 +3,60 @@ import axios from "axios";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer
 } from "recharts";
-import './SeverityChart.css'; // Import the CSS
+import './SeverityChart.css';
 
 export default function SeverityChart() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [drugs, setDrugs] = useState([]);
   const [selectedDrug, setSelectedDrug] = useState("All");
+  const [allReports, setAllReports] = useState([]);
 
   useEffect(() => {
     fetchReports();
-  }, [selectedDrug]);
+  }, []);
+
+  useEffect(() => {
+    if (allReports.length) updateChartData();
+  }, [selectedDrug, allReports]);
 
   const fetchReports = async () => {
     setLoading(true);
     try {
       const res = await axios.get("https://report-assistant.onrender.com/api/reports/");
-      const reports = res.data;
+      const reports = res.data || [];
+
+      setAllReports(reports);
 
       // Extract unique drugs
       const uniqueDrugs = Array.from(new Set(reports.map(r => r.drug || "Unknown")));
       setDrugs(["All", ...uniqueDrugs]);
-
-      // Filter by selected drug
-      const filteredReports = selectedDrug === "All" ? reports : reports.filter(r => r.drug === selectedDrug);
-
-      // Count severity occurrences
-      const severityCount = filteredReports.reduce((acc, report) => {
-        const sev = report.severity || "Unknown";
-        acc[sev] = (acc[sev] || 0) + 1;
-        return acc;
-      }, {});
-
-      const chartData = Object.keys(severityCount).map(key => ({
-        severity: key,
-        count: severityCount[key],
-      }));
-
-      setData(chartData);
     } catch (err) {
       console.error("Failed to fetch reports for chart", err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const updateChartData = () => {
+    const filteredReports = selectedDrug === "All" 
+      ? allReports 
+      : allReports.filter(r => r.drug === selectedDrug);
+
+    const severityOrder = ["Mild", "Moderate", "Severe", "Unknown"];
+
+    const severityCount = filteredReports.reduce((acc, report) => {
+      const sev = report.severity || "Unknown";
+      acc[sev] = (acc[sev] || 0) + 1;
+      return acc;
+    }, {});
+
+    const chartData = severityOrder.map(sev => ({
+      severity: sev,
+      count: severityCount[sev] || 0,
+    }));
+
+    setData(chartData);
   };
 
   if (loading) return <p className="loading">Loading chart...</p>;
@@ -55,7 +66,6 @@ export default function SeverityChart() {
     <div className="severity-chart-container">
       <h2>Severity Distribution</h2>
 
-      {/* Drug filter */}
       <div className="drug-filter">
         <label>Filter by Drug:</label>
         <select
@@ -74,7 +84,7 @@ export default function SeverityChart() {
           <XAxis dataKey="severity" />
           <YAxis allowDecimals={false} />
           <Tooltip />
-          <Bar dataKey="count" fill="#10b981" /> {/* green bars */}
+          <Bar dataKey="count" fill="#10b981" />
         </BarChart>
       </ResponsiveContainer>
     </div>

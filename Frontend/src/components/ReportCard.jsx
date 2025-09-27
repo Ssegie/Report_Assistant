@@ -8,19 +8,19 @@ export default function ReportCard({ report }) {
   const handleTranslate = async (lang) => {
     try {
       const res = await axios.post("https://report-assistant.onrender.com/api/translate/", {
-        text: report.outcome,
+        outcome: report.outcome, // matches backend
         lang,
       });
       setTranslation((prev) => ({ ...prev, [lang]: res.data.translated }));
     } catch (err) {
-      console.error(err);
+      console.error("Translation error:", err);
     }
   };
 
   return (
     <div className="report-card">
       <h3>Drug: {report.drug}</h3>
-      <p><strong>Adverse Event:</strong> {report.adverse_event}</p>
+      <p><strong>Adverse Event:</strong> {report.adverse_events}</p>
       <p><strong>Severity:</strong> {report.severity}</p>
       <p><strong>Outcome:</strong> {report.outcome}</p>
 

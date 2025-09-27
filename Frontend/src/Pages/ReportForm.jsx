@@ -2,12 +2,19 @@ import { useState } from "react";
 import axios from "axios";
 import "./ReportForm.css";
 
+// Axios instance
+const api = axios.create({
+  baseURL: "https://report-assistant.onrender.com/api",
+  timeout: 20000,
+});
+
 export default function ReportForm({ onReportProcessed }) {
   const [drug, setDrug] = useState("");
   const [adverseEvent, setAdverseEvent] = useState("");
   const [severity, setSeverity] = useState("");
   const [outcome, setOutcome] = useState("");
-  const [reportText, setReportText] = useState(""); 
+  const [reportText, setReportText] = useState("");
+
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -24,32 +31,30 @@ export default function ReportForm({ onReportProcessed }) {
     try {
       const formData = new FormData();
 
+      // Structured submission (all fields must be filled)
       if (drug && adverseEvent && severity && outcome) {
-        // ✅ Structured submission
         formData.append("drug", drug);
-        formData.append("adverse_event", adverseEvent); // singular key
+        formData.append("adverse_events", adverseEvent); // ✅ plural, matches backend
         formData.append("severity", severity);
         formData.append("outcome", outcome);
       } else if (reportText.trim() || file) {
-        // ✅ Free-text submission
-        if (reportText.trim()) {
-          formData.append("report_text", reportText);
-        }
+        // Free-text submission
+        if (reportText.trim()) formData.append("report_text", reportText);
       } else {
-        setError("Please fill structured fields or provide a report text/file");
+        setError("Please fill all structured fields OR provide report text/file");
         setLoading(false);
         return;
       }
 
-      if (file) {
-        formData.append("file", file);
+      if (file) formData.append("file", file);
+
+      // 🔍 DEBUG: log all FormData before sending
+      console.log("🚀 Sending FormData:");
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
       }
 
-      const res = await axios.post(
-        "https://report-assistant.onrender.com/api/process-report/",
-        formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
-      );
+      const res = await api.post("/process-report/", formData);
 
       onReportProcessed(res.data);
 
@@ -60,9 +65,14 @@ export default function ReportForm({ onReportProcessed }) {
       setOutcome("");
       setReportText("");
       setFile(null);
+      document.querySelector('input[type="file"]').value = "";
     } catch (err) {
-      console.error("❌ Backend error:", err.response?.data || err.message);
-      setError(err.response?.data?.error || "Failed to submit report");
+      console.error("❌ Backend error:", err);
+
+      if (err.response) setError(err.response.data?.error || "Server error occurred");
+      else if (err.request)
+        setError("No response from server. Check if backend is running & CORS enabled.");
+      else setError("Request setup failed: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -81,10 +91,7 @@ export default function ReportForm({ onReportProcessed }) {
         />
 
         <label>Adverse Event</label>
-        <select
-          value={adverseEvent}
-          onChange={(e) => setAdverseEvent(e.target.value)}
-        >
+        <select value={adverseEvent} onChange={(e) => setAdverseEvent(e.target.value)}>
           <option value="">Select an adverse event</option>
           {adverseOptions.map((ae) => (
             <option key={ae} value={ae}>
